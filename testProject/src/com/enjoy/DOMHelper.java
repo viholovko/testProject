@@ -4,6 +4,7 @@ package com.enjoy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -17,7 +18,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class DOMHelper {
-	private static final String NODE = "note";
+	public static final String NODE = "note";
 	
 	private String [] elementArray = {"to","from","heading","body"};
 	private Holder holder;
@@ -27,6 +28,21 @@ public class DOMHelper {
 		String s = fileURL + "/file" + new Integer(fileIndex+1).toString() + ".xml";
 		File file1 = new File(s);
 		return file1;
+	}
+	
+	
+	/*
+	 * returns the array names of tags 
+	 */
+	public String [] getElementArray(){
+		return elementArray;
+	}
+	
+	/*
+	 * returns single Element of tag array
+	 */
+	public String getSingleElement(int index){
+		return elementArray[index];
 	}
 	
 	public void parseXML(File file) throws ParserConfigurationException, SAXException, IOException{
@@ -88,4 +104,20 @@ public class DOMHelper {
 			break;		
 		}
 	}
+	
+	/*
+	 * Creating and deleting list of files
+	 */
+	public List<File> createListOfFiles(File directory){
+		if(directory.isDirectory()){
+			List<File> lst = new ArrayList<File>();
+			for(File f : directory.listFiles()){
+				lst.add(f);
+			}
+			return lst;
+		}
+		return null;
+	}
+	
+	
 }

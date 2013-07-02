@@ -13,24 +13,32 @@ import org.xml.sax.SAXException;
 public class TestXML {
 	//private static final String MY_URL = "http://www.w3schools.com/xml/note.xml";
 	private static final String MY_URL = "D:/XMLTest";
+	private static final String DESTINATION_FILE_URL = "D:/MyXML/test.xml";
 	private DOMHelper helper;
+	private List<File> fileList;
+	private FileWriteHelper writeFile;
 	
 	public static void main(String[] args) {
 		TestXML test = new TestXML();
 		try {
 //			java.net.URL url = new URL(MY_URL);
 //			URLConnection conn = url.openConnection();
+			
 			test.helper = new DOMHelper();
 			File file = new File(MY_URL);
-			if(file.isDirectory()){
-				int length = file.listFiles().length;
-				for(int i = 0; i < length; i++){
-					file = test.helper.getSingleFileName(MY_URL, i);
-					test.helper.parseXML(file);
-					test.helper.deleteFile(file);
-				}
-			}				
+			File destinationFile = new File(DESTINATION_FILE_URL);
+			test.fileList = test.helper.createListOfFiles(file);
+			test.writeFile = new FileWriteHelper();
 			
+			if(test.fileList!=null){
+				for(File tempFile : test.fileList){
+					test.helper.parseXML(tempFile);
+					test.helper.deleteFile(file);
+					test.helper.deleteFile(tempFile);
+				}
+			}
+			test.showXML();
+			test.writeFile.writeToFile(destinationFile);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -39,21 +47,19 @@ public class TestXML {
 			e.printStackTrace();
 		} catch (SAXException e) {
 			e.printStackTrace();
-		}
-		test.showXML();
-		
+		}finally{}
 	}	
 	
+		
 	private void showXML(){
 		if(helper.getHolderList()!=null && helper.getHolderList().size()>0){
 			List<Holder> list = helper.getHolderList();
 			Iterator<Holder> iter = list.iterator();
 			while(iter.hasNext()){
-				Holder hold = (Holder) iter.next();
-				System.out.println("To: " + hold.getTo());
-				System.out.println("From: " + hold.getFrom());
-				System.out.println("Title: " + hold.getTitle());
-				System.out.println("Message: " + hold.getMessage());
+				Holder tempHolder = (Holder) iter.next();
+				for(int i = 0; i < helper.getElementArray().length; i++){
+					writeFile.createXMLBuffer(helper.getSingleElement(i),i,tempHolder);
+				}
 			}
 		}
 	}
